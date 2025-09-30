@@ -1,0 +1,46 @@
+# vim: set filetype=zsh:
+###############################################################################
+# User configuration sourced by interactive shells
+###############################################################################
+
+# ------------------------------
+# Modules
+# ------------------------------
+
+zmodule environment
+zmodule input
+zmodule joke/zim-mise
+zmodule termtitle
+zmodule utility
+
+zmodule ssh
+zmodule exa
+zmodule direnv
+zmodule joke/zim-chezmoi
+zmodule kiesman99/zim-zoxide
+zmodule shanwker1223/zim-alias-finder
+
+zmodule fzf
+
+# ------------------------------
+# Prompt
+# ------------------------------
+
+zmodule joke/zim-starship
+
+# ------------------------------
+# Completion
+# ------------------------------
+
+zmodule zsh-users/zsh-completions --fpath src
+zmodule gradle/gradle-completion --fpath .
+
+zmodule completion
+
+# ------------------------------
+# Modules that must be initialized last
+# ------------------------------
+
+zmodule zsh-users/zsh-syntax-highlighting
+zmodule zsh-users/zsh-history-substring-search
+zmodule zsh-users/zsh-autosuggestions

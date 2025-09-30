@@ -1,0 +1,30 @@
+# vim: set filetype=toml:
+
+[tools]
+chezmoi = "latest"
+go = { version = "latest", postinstall = "mise run go:setup" }
+node = "lts"
+pnpm = { version = "latest", postinstall = "mise run pnpm:setup" }
+rust = "stable"
+usage = "latest"
+
+{{- if eq .chezmoi.os "darwin" }}
+# node = "lts"
+# pnpm = "latest"
+{{- end }}
+
+{{- if eq .chezmoi.os "linux" }}
+bat = "latest"
+eza = "latest"
+fzf = "latest"
+neovim = { version = "latest", postinstall = "mise run nvim:setup" }
+python = "latest"
+rg = "latest"
+starship = "latest"
+zoxide = "latest"
+
+"cargo:erdtree" = "latest"
+"cargo:tree-sitter-cli" = "latest"
+{{- end }}
+
+[env]

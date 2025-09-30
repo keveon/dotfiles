@@ -1,0 +1,93 @@
+# vim: set filetype=zsh:
+###############################################################################
+# ~/.zprofile
+###############################################################################
+
+# 计算长主机名（优先 FQDN，退回短名）
+long_host="$(hostname -f 2>/dev/null || hostname)"
+
+# tmux：SSH 交互登录 + 不在 tmux 时自动进入
+# 可覆盖：
+#   export TMUX_CC=1/0/auto         # 强制启用/禁用/自动侦测 -CC（默认 auto）
+#   export TMUX_SESSION=<session>   # 自定义会话名，默认 "<long_host>-<user>"
+if command -v tmux >/dev/null 2>&1; then
+  if [[ -n "$SSH_TTY" && -z "$TMUX" && -t 1 ]]; then
+    session="${TMUX_SESSION:-${long_host}-$USER}"
+
+    # iTerm2 远程会透传 LC_TERMINAL=iTerm2
+    use_cc=0
+    case "${TMUX_CC:-auto}" in
+      1|true|on|yes) use_cc=1 ;;
+      0|false|off|no) use_cc=0 ;;
+      auto) [[ "${LC_TERMINAL:-}" == "iTerm2" ]] && use_cc=1 ;;
+    esac
+
+    if [[ $use_cc -eq 1 ]]; then
+      tmux -u -CC new-session -A -s "$session"
+    else
+      tmux new-session -A -s "$session"
+    fi
+    exit
+  fi
+fi
+
+# ---- pretty uptime (GNU/BSD 兼容) ----
+_pretty_uptime() {
+  if uptime -p >/dev/null 2>&1; then
+    uptime -p
+  else
+    # BSD/macOS：抽取 "up xxx" 部分，失败就退回原始 uptime
+    local s
+    s="$(uptime 2>/dev/null)" || return 0
+    echo "$s" | sed -E 's/.* up (.*), [0-9]+ user(s)?,.*/up \1/' 2>/dev/null || echo "$s"
+  fi
+}
+
+# ---- Chezmoi 自动更新 (可选) ----
+{{ if env "CHEZMOI_AUTO_UPDATE" }}
+__chezmoi_auto_update() {
+  local chezmoi_dir="{{ .chezmoi.sourceDir }}"
+  local last_update_file="$HOME/.cache/chezmoi_last_update"
+  local update_interval="{{ env "CHEZMOI_UPDATE_INTERVAL" | default "86400" }}"  # 默认24小时
+
+  # 检查是否需要更新
+  if [[ ! -f "$last_update_file" ]] || \
+     [[ $(($(date +%s) - $(cat "$last_update_file" 2>/dev/null || echo 0))) -gt $update_interval ]]; then
+
+    echo "🔄 检查 Chezmoi 配置更新..."
+    if [[ -d "$chezmoi_dir" && -d "$chezmoi_dir/.git" ]]; then
+      cd "$chezmoi_dir"
+
+      # 检查是否有远程更新
+      if git fetch --dry-run 2>/dev/null | grep -q '.'; then
+        echo "📥 发现配置更新，正在下载并应用..."
+        git pull --rebase
+
+        # 检查是否有冲突
+        if ! git diff --quiet HEAD~1 HEAD; then
+          echo "⚠️  检测到配置变更，应用中..."
+          chezmoi apply --force
+        fi
+
+        echo "✅ 配置更新完成！"
+        echo "💡 如需查看变更: cd $chezmoi_dir && git log --oneline -5"
+      else
+        echo "✅ 配置已是最新"
+      fi
+    fi
+
+    # 记录更新时间
+    date +%s > "$last_update_file"
+  fi
+}
+
+# 在登录时检查更新 (后台运行，不影响登录速度)
+__chezmoi_auto_update &
+unset -f __chezmoi_auto_update
+{{ end }}
+
+# ---- 欢迎信息：只在 SSH 登录时显示（本地新会话不显示）----
+if [[ -n "$SSH_TTY" ]]; then
+  long_host="$(hostname -f 2>/dev/null || hostname)"
+  printf 'Welcome %s@%s — %s\n' "$USER" "$long_host" "$(_pretty_uptime)"
+fi
