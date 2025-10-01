@@ -5,7 +5,7 @@ chezmoi = "latest"
 go = { version = "latest", postinstall = "mise run go:setup" }
 node = "lts"
 pnpm = { version = "latest", postinstall = "mise run pnpm:setup" }
-rust = "stable"
+rust = { version = "stable", preinstall = "mise run rust:prepare" }
 usage = "latest"
 
 {{- if eq .chezmoi.os "darwin" }}

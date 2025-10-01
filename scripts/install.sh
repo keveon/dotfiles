@@ -41,7 +41,7 @@ if [[ "$OS" == "macos" ]]; then
     fi
 
     echo "📦 通过 Homebrew 安装依赖包..."
-    brew install gpg tmux wget jq httpie unzip
+    brew install gpg tmux wget jq htop httpie unzip
 
 else
     # Linux 使用 apt-get
@@ -81,7 +81,7 @@ if [[ -d "$HOME/.local/share/chezmoi" ]]; then
     chezmoi update
 else
     echo "📥 克隆并应用 Dotfiles..."
-    chezmoi init --apply --force ${GITHUB_USERNAME:-keveon}
+    mise exec chezmoi -- chezmoi init --apply --force ${GITHUB_USERNAME:-keveon}
 fi
 
 # 配置默认 shell
@@ -154,6 +154,7 @@ echo "📝 下一步："
 echo "   1. 编辑本地配置: vim $LOCAL_ENV_FILE"
 echo "   2. 重启 shell 或运行: source ~/.zshrc"
 echo "   3. 运行: chezmoi status"
+echo "   4. 运行: mise install && exec zsh"
 echo ""
 echo "🔧 常用命令："
 echo "   chezmoi apply    # 应用配置"

@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 #MISE description="初始化 Rust，配置镜像"
-#USAGE flag "-m --mirror" help="镜像站地址，默认使用清华源，如不需要可传 false 禁用"
+#USAGE flag "-m --mirror <url>" help="镜像站地址，默认使用清华源，如不需要可传 false 禁用"
 #USAGE flag "-h --help" help="显示帮助信息"
 
 set -euo pipefail
@@ -16,7 +16,7 @@ MIRROR_URL="$DEFAULT_MIRROR"
 while [[ $# -gt 0 ]]; do
   case $1 in
     -m|--mirror)
-      MIRROR_URL="$2"
+      MIRROR_URL="$usage_mirror"
       shift 2
       ;;
     -h|--help)
@@ -95,12 +95,12 @@ echo "配置 Cargo 镜像..."
 if [[ "$USE_MIRROR" == "true" ]]; then
   cat <<EOF > "$CARGO_CONFIG"
 [source.crates-io]
-replace-with = 'tuna'
+replace-with = 'mirror'
 
-[source.tuna]
+[source.mirror]
 registry = "sparse+$MIRROR_URL/crates.io-index/"
 
-[registries.tuna]
+[registries.mirror]
 index = "sparse+$MIRROR_URL/crates.io-index/"
 EOF
   echo "✓ Cargo 镜像配置完成: $MIRROR_URL"

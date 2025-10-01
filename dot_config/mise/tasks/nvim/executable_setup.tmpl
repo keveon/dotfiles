@@ -11,8 +11,9 @@ fi
 
 {{ if eq .chezmoi.os "linux" }}
 if command -v update-alternatives >/dev/null 2>&1; then
-    update-alternatives --install /usr/bin/vi     vi     /usr/bin/nvim 60
-    update-alternatives --install /usr/bin/vim    vim    /usr/bin/nvim 60
-    update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+    # ln -s $(mise bin-paths neovim)/nvim /usr/bin/nvim
+    # update-alternatives --install /usr/bin/vi     vi     $(mise bin-paths neovim)/nvim 60
+    # update-alternatives --install /usr/bin/vim    vim    $(mise bin-paths neovim)/nvim 60
+    # update-alternatives --install /usr/bin/editor editor $(mise bin-paths neovim)/nvim 60
 fi
 {{ end}}
