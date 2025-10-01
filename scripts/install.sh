@@ -41,7 +41,7 @@ if [[ "$OS" == "macos" ]]; then
     fi
 
     echo "📦 通过 Homebrew 安装依赖包..."
-    brew install gpg tmux wget jq htop httpie unzip
+    brew install gpg tmux wget jq httpie unzip
 
 else
     # Linux 使用 apt-get
