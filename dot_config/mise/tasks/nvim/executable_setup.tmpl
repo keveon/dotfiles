@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+#MISE description="初始化 Neovim，包括主题、LSP、Tree Sitter 等"
+#MISE env={ NONINTERACTIVE = true }
+
+if command -v curl >/dev/null 2>&1; then
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ayamir/nvimdots/HEAD/scripts/install.sh)"
+else
+    bash -c "$(wget -O- https://raw.githubusercontent.com/ayamir/nvimdots/HEAD/scripts/install.sh)"
+fi
+
+{{ if eq .chezmoi.os "linux" }}
+if command -v update-alternatives >/dev/null 2>&1; then
+    # ln -s $(mise bin-paths neovim)/nvim /usr/bin/nvim
+    # update-alternatives --install /usr/bin/vi     vi     $(mise bin-paths neovim)/nvim 60
+    # update-alternatives --install /usr/bin/vim    vim    $(mise bin-paths neovim)/nvim 60
+    # update-alternatives --install /usr/bin/editor editor $(mise bin-paths neovim)/nvim 60
+fi
+{{ end}}

@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "timonwong.shellcheck",
+    "mkhl.shfmt",
+    "golang.go",
+    "rust-lang.rust-analyzer",
+    "bradlc.vscode-tailwindcss",
+    "astro-build.astro-vscode"
+  ],
+  "unwantedRecommendations": []
+}

@@ -1,0 +1,29 @@
+# Local environment variables (sensitive data)
+*.env
+.env
+.env.local
+!.env.example
+
+# Chezmoi local configuration
+chezmoi.local.toml
+.local.toml
+
+# User-specific configuration
+*.local
+.local
+.user
+
+# Editor and IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

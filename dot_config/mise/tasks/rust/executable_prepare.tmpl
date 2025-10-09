@@ -1,0 +1,137 @@
+#!/usr/bin/env zsh
+
+#MISE description="初始化 Rust，配置镜像"
+#USAGE flag "-m --mirror <url>" help="镜像站地址，默认使用清华源，如不需要可传 false 禁用"
+#USAGE flag "-h --help" help="显示帮助信息"
+
+set -euo pipefail
+
+# 默认镜像地址
+DEFAULT_MIRROR="https://mirrors.tuna.tsinghua.edu.cn"
+
+# 解析命令行参数
+USE_MIRROR=true
+MIRROR_URL="$DEFAULT_MIRROR"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -m|--mirror)
+      MIRROR_URL="$usage_mirror"
+      shift 2
+      ;;
+    -h|--help)
+      echo "用法: $0 [-m|--mirror MIRROR_URL]"
+      echo "选项:"
+      echo "  -m, --mirror    镜像站地址，默认使用清华源，传 false 禁用"
+      echo "  -h, --help      显示此帮助信息"
+      exit 0
+      ;;
+    *)
+      echo "未知参数: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# 检查是否禁用镜像
+if [[ "$MIRROR_URL" == "false" ]]; then
+  USE_MIRROR=false
+  echo "检测到镜像禁用参数，将使用官方源"
+fi
+
+# 验证镜像 URL
+if [[ "$USE_MIRROR" == "true" ]] && [[ ! "$MIRROR_URL" =~ ^https?:// ]]; then
+  echo "错误: 镜像 URL 格式不正确: $MIRROR_URL"
+  echo "应以 http:// 或 https:// 开头"
+  exit 1
+fi
+
+{{ if eq .chezmoi.os "linux" }}
+# 检查是否需要安装编译依赖
+if command -v apt-get >/dev/null 2>&1; then
+  echo "检测到 apt-get，建议安装以下包以支持交叉编译："
+  echo "  build-essential gcc-multilib"
+  echo "如需安装，请运行: sudo apt-get install -y build-essential gcc-multilib"
+  echo
+fi
+{{ end}}
+
+# 设置环境变量
+CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
+ZSHRC_DIR="$HOME/.zshrc.d"
+
+# 创建必要的目录
+echo "创建配置目录..."
+mkdir -vp "$ZSHRC_DIR"
+mkdir -vp "$CARGO_DIR"
+
+# 配置 Rustup 镜像（如果启用）
+if [[ "$USE_MIRROR" == "true" ]]; then
+  echo "配置 Rustup 镜像: $MIRROR_URL"
+
+  # 创建或更新 rust.zsh
+  cat <<EOF > "$ZSHRC_DIR/rust.zsh"
+# Rust 镜像配置
+export RUSTUP_DIST_SERVER=$MIRROR_URL/rustup
+export RUSTUP_UPDATE_ROOT=$MIRROR_URL/rustup/rustup
+EOF
+
+  # 立即加载环境变量
+  source "$ZSHRC_DIR/rust.zsh"
+  echo "✓ Rustup 镜像配置完成"
+else
+  echo "跳过 Rustup 镜像配置"
+  # 删除可能存在的镜像配置
+  if [[ -f "$ZSHRC_DIR/rust.zsh" ]]; then
+    echo "移除现有的 Rustup 镜像配置..."
+    rm -f "$ZSHRC_DIR/rust.zsh"
+  fi
+fi
+
+# 配置 Cargo 镜像
+CARGO_CONFIG="$CARGO_DIR/config.toml"
+echo "配置 Cargo 镜像..."
+
+if [[ "$USE_MIRROR" == "true" ]]; then
+  cat <<EOF > "$CARGO_CONFIG"
+[source.crates-io]
+replace-with = 'mirror'
+
+[source.mirror]
+registry = "sparse+$MIRROR_URL/crates.io-index/"
+
+[registries.mirror]
+index = "sparse+$MIRROR_URL/crates.io-index/"
+EOF
+  echo "✓ Cargo 镜像配置完成: $MIRROR_URL"
+else
+  cat <<EOF > "$CARGO_CONFIG"
+# 使用官方源，无镜像配置
+# 如需重新配置镜像，可重新运行此脚本并指定镜像地址
+EOF
+  echo "✓ Cargo 配置完成（使用官方源）"
+fi
+
+# 验证配置
+echo
+echo "配置摘要:"
+if [[ "$USE_MIRROR" == "true" ]]; then
+  echo "  - 镜像状态: 启用 ($MIRROR_URL)"
+else
+  echo "  - 镜像状态: 禁用"
+fi
+echo "  - Cargo 配置: $CARGO_CONFIG"
+if [[ "$USE_MIRROR" == "true" ]]; then
+  echo "  - ZSH 配置: $ZSHRC_DIR/rust.zsh"
+else
+  echo "  - ZSH 配置: 无"
+fi
+
+echo
+echo "配置完成！请重新启动终端或运行以下命令使配置生效："
+echo "  source ~/.zshrc"
+echo
+echo "验证配置："
+echo "  rustup --version    # 检查 Rustup"
+echo "  cargo --version     # 检查 Cargo"
+echo "  cargo search test   # 测试包下载速度"

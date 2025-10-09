@@ -1,0 +1,52 @@
+# vim: set filetype=zsh:
+###############################################################################
+# ~/.zshenv
+###############################################################################
+
+# -- 基础本地化 --
+export LANG=zh_CN.UTF-8
+export LC_ALL=zh_CN.UTF-8
+
+# -- 统一的 PATH 追加函数 --
+path_prepend() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH";; esac }
+
+# -- Brew shellenv 自动探测（Apple Silicon / Intel Mac / Linuxbrew）--
+__brew_shellenv() {
+  # 1) 常见安装前缀优先
+  local candidates=(
+    /opt/homebrew/bin/brew                 # Apple Silicon (ARM) macOS
+    /usr/local/bin/brew                    # Intel macOS
+    /home/linuxbrew/.linuxbrew/bin/brew    # Linuxbrew (多用户)
+    "$HOME/.linuxbrew/bin/brew"            # Linuxbrew (单用户)
+  )
+
+  local b
+  for b in "${candidates[@]}"; do
+    if [[ -x "$b" ]]; then
+      eval "$("$b" shellenv)"
+      return
+    fi
+  done
+
+  # 2) 兜底：PATH 里能找到 brew 的情况
+  if command -v brew >/dev/null 2>&1; then
+    eval "$(brew shellenv)"
+    return
+  fi
+
+  # 3) 没装 Brew 就略过
+  return 0
+}
+
+__brew_shellenv
+unset -f __brew_shellenv
+
+# -- 追加常用路径到 PATH --
+for d in "${KREW_ROOT:-$HOME/.krew}/bin" "$HOME/.local/bin" "$HOME/bin"; do
+  [[ -d "$d" ]] && path_prepend "$d"
+done
+
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR="nvim"
+  export VISUAL="nvim"
+fi
