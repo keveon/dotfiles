@@ -59,7 +59,7 @@
                         <li>
                             初始化配置: <code
                                 class="bg-gradient-to-r from-emerald-100 to-cyan-100 dark:from-emerald-900 dark:to-cyan-900 px-3 py-1 rounded border border-emerald-300 dark:border-cyan-700"
-                                >chezmoi init keveon/chezmoi-starter</code
+                                >chezmoi init keveon</code
                             >
                         </li>
                         <li>

@@ -7,8 +7,8 @@
     let originalCopyButtonText = "📋 复制";
 
     const commands = {
-        curl: "curl -fsSL https://chezmoi.keveon.io/install.sh | bash",
-        wget: "wget -qO- https://chezmoi.keveon.io/install.sh | bash",
+        curl: "curl -fsSL https://dotfiles.keveon.io/install.sh | bash",
+        wget: "wget -qO- https://dotfiles.keveon.io/install.sh | bash",
     };
 
     // 切换标签页

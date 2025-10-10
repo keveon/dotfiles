@@ -16,14 +16,14 @@
 ### 方法1: 一键安装 (推荐)
 ```bash
 # 使用 Curl
-curl -fsSL https://chezmoi.keveon.io/install.sh | bash
+curl -fsSL https://dotfiles.keveon.io/install.sh | bash
 
 # 使用 Wget
-wget -qO- https://chezmoi.keveon.io/install.sh | bash
+wget -qO- https://dotfiles.keveon.io/install.sh | bash
 
 # 或者克隆仓库后运行
-git clone https://github.com/keveon/chezmoi-starter.git
-cd chezmoi-starter
+git clone https://github.com/keveon/dotfiles.git
+cd dotfiles
 ./docs/public/install.sh
 ```
 
@@ -39,7 +39,7 @@ curl https://mise.run | sh
 mise use -g chezmoi
 
 # 克隆配置
-chezmoi init keveon/chezmoi-starter
+chezmoi init keveon
 ```
 
 #### 3. 应用配置
@@ -432,7 +432,7 @@ mise run dotfiles:sync  # 同步配置
 
 本项目提供了现代化的文档网站：
 
-- **网址**: https://chezmoi.keveon.io
+- **网址**: https://dotfiles.keveon.io
 - **功能**: 在线查看配置说明、一键安装、常用命令参考
 - **技术**: Astro + Tailwind CSS，支持深色模式
 

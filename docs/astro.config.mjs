@@ -6,5 +6,5 @@ export default defineConfig({
   integrations: [tailwind(), svelte()],
   output: "static",
   base: "/",
-  site: "https://chezmoi.keveon.io",
+  site: "https://dotfiles.keveon.io",
 });

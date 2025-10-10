@@ -3,10 +3,13 @@
 
 set -e
 
-echo "🏠 Keveon's Dotfiles 安装程序"
+echo "🏠 Dotfiles 安装程序"
 echo "=================================="
 
-GITHUB_USERNAME=keveon
+## 以下这几种方式都是可以的
+# REPO_SLUG=github.com/keveon/dotfiles
+# REPO_SLUG=keveon/dotfiles
+REPO_SLUG=${REPO_SLUG:-keveon/dotfiles}
 
 # 检测操作系统
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -81,7 +84,7 @@ if [[ -d "$HOME/.local/share/chezmoi" ]]; then
     chezmoi update
 else
     echo "📥 克隆并应用 Dotfiles..."
-    mise exec chezmoi -- chezmoi init --apply --force ${GITHUB_USERNAME:-keveon}/${REPO_NAME:-chezmoi-starter}
+    mise exec chezmoi -- chezmoi init --apply --force $REPO_SLUG
 fi
 
 # 配置默认 shell
@@ -151,10 +154,9 @@ echo ""
 echo "🎉 安装完成！"
 echo ""
 echo "📝 下一步："
-echo "   1. 编辑本地配置: vim $LOCAL_ENV_FILE"
-echo "   2. 重启 shell 或运行: source ~/.zshrc"
-echo "   3. 运行: chezmoi status"
-echo "   4. 运行: mise install && exec zsh"
+echo "   1. 重启 shell 或运行: exec zsh"
+echo "   2. 运行: chezmoi status"
+echo "   3. 运行: mise install && exec zsh"
 echo ""
 echo "🔧 常用命令："
 echo "   chezmoi apply    # 应用配置"
