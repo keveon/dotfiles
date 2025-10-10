@@ -133,7 +133,7 @@
 
 <button
     id="theme-toggle"
-    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+    class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
     title="切换主题"
     on:click={toggleTheme}
 >
