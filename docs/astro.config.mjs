@@ -1,9 +1,10 @@
-import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import { defineConfig } from "astro/config";
+import tailwind from "@astrojs/tailwind";
+import svelte from "@astrojs/svelte";
 
 export default defineConfig({
-  integrations: [tailwind()],
-  output: 'static',
-  base: '/',
-  site: 'https://chezmoi.keveon.io',
+  integrations: [tailwind(), svelte()],
+  output: "static",
+  base: "/",
+  site: "https://chezmoi.keveon.io",
 });
