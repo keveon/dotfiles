@@ -58,34 +58,28 @@ fi
 
 # 设置环境变量
 CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
-ZSHRC_DIR="$HOME/.zshrc.d"
 
 # 创建必要的目录
 echo "创建配置目录..."
-mkdir -vp "$ZSHRC_DIR"
 mkdir -vp "$CARGO_DIR"
 
 # 配置 Rustup 镜像（如果启用）
 if [[ "$USE_MIRROR" == "true" ]]; then
   echo "配置 Rustup 镜像: $MIRROR_URL"
 
-  # 创建或更新 rust.zsh
-  cat <<EOF > "$ZSHRC_DIR/rust.zsh"
-# Rust 镜像配置
-export RUSTUP_DIST_SERVER=$MIRROR_URL/rustup
-export RUSTUP_UPDATE_ROOT=$MIRROR_URL/rustup/rustup
-EOF
+  # Rust 镜像配置
+  mise set -g RUSTUP_DIST_SERVER=$MIRROR_URL/rustup
+  mise set -g RUSTUP_UPDATE_ROOT=$MIRROR_URL/rustup/rustup
 
-  # 立即加载环境变量
-  source "$ZSHRC_DIR/rust.zsh"
   echo "✓ Rustup 镜像配置完成"
 else
-  echo "跳过 Rustup 镜像配置"
   # 删除可能存在的镜像配置
-  if [[ -f "$ZSHRC_DIR/rust.zsh" ]]; then
-    echo "移除现有的 Rustup 镜像配置..."
-    rm -f "$ZSHRC_DIR/rust.zsh"
-  fi
+  echo "移除现有的 Rustup 镜像配置..."
+
+  mise unset -g RUSTUP_DIST_SERVER
+  mise unset -g RUSTUP_UPDATE_ROOT
+
+  echo "✓ 移除 Rustup 镜像配置完成"
 fi
 
 # 配置 Cargo 镜像
@@ -121,15 +115,9 @@ else
   echo "  - 镜像状态: 禁用"
 fi
 echo "  - Cargo 配置: $CARGO_CONFIG"
-if [[ "$USE_MIRROR" == "true" ]]; then
-  echo "  - ZSH 配置: $ZSHRC_DIR/rust.zsh"
-else
-  echo "  - ZSH 配置: 无"
-fi
 
 echo
-echo "配置完成！请重新启动终端或运行以下命令使配置生效："
-echo "  source ~/.zshrc"
+echo "配置完成！配置已经自动生效！"
 echo
 echo "验证配置："
 echo "  rustup --version    # 检查 Rustup"
