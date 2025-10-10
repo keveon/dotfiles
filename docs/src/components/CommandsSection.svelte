@@ -84,11 +84,11 @@
 </script>
 
 <section
-    class="py-20 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-100 dark:from-violet-900 dark:via-purple-900 dark:to-indigo-950"
+    class="py-20 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-100 dark:from-stone-800 dark:via-slate-800 dark:to-zinc-900"
 >
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2
-            class="text-3xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-400"
+            class="text-3xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-slate-400 dark:to-zinc-400"
         >
             🔧 常用命令
         </h2>

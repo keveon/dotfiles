@@ -60,11 +60,11 @@
 </script>
 
 <section
-    class="bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-sky-900 dark:via-blue-900 dark:to-cyan-950 py-20"
+    class="bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-800 dark:via-gray-800 dark:to-neutral-900 py-20"
 >
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1
-            class="text-4xl md:text-6xl font-bold text-gray-800 dark:text-white mb-6 drop-shadow-lg"
+            class="text-4xl md:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-6 drop-shadow-lg"
         >
             <span class="text-5xl md:text-7xl drop-shadow-lg animate-pulse"
                 >🏠</span
@@ -73,7 +73,7 @@
             个人 Dotfiles 配置
         </h1>
         <p
-            class="text-xl md:text-2xl text-gray-700 dark:text-gray-200 mb-8 max-w-3xl mx-auto drop-shadow-lg"
+            class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto drop-shadow-lg"
         >
             基于 Chezmoi + Mise + Zim 的多平台配置管理方案，支持 macOS 和 Linux
         </p>

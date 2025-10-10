@@ -1,5 +1,5 @@
 <section
-    class="py-20 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-950"
+    class="py-20 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-cyan-800 dark:via-teal-800 dark:to-emerald-900"
 >
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2

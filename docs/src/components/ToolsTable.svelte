@@ -31,11 +31,11 @@
 </script>
 
 <section
-    class="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 dark:from-amber-900 dark:via-orange-900 dark:to-yellow-950"
+    class="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 dark:from-stone-800 dark:via-amber-800 dark:to-neutral-900"
 >
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2
-            class="text-3xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400"
+            class="text-3xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 dark:from-stone-400 dark:to-amber-400"
         >
             🛠️ 包含工具
         </h2>
@@ -65,7 +65,7 @@
                     {#each toolsData as tool, index}
                         <tr class:odd={index % 2 === 1}>
                             <td
-                                class="px-6 py-4 font-medium text-gray-900 dark:text-white"
+                                class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100"
                                 >{tool.type}</td
                             >
                             {#if tool.colspan}
