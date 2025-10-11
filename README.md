@@ -15,15 +15,25 @@
 
 ### 方法1: 一键安装 (推荐)
 ```bash
-# 使用 Curl
+# 使用 Curl (HTTPS)
 curl -fsSL https://dotfiles.keveon.io/install.sh | bash
 
-# 使用 Wget
+# 使用 Wget (HTTPS)
 wget -qO- https://dotfiles.keveon.io/install.sh | bash
+
+# 使用 Curl (SSH协议)
+curl -fsSL https://dotfiles.keveon.io/install.sh | bash -s -- --ssh
+
+# 使用 Wget (SSH协议)
+wget -qO- https://dotfiles.keveon.io/install.sh | bash -s -- --ssh
 
 # 或者克隆仓库后运行
 git clone https://github.com/keveon/dotfiles.git
 cd dotfiles
+./docs/public/install.sh --ssh  # 使用SSH协议
+
+# 如需重新安装，请删除现有配置后重新运行
+rm -rf ~/.local/share/chezmoi
 ./docs/public/install.sh
 ```
 

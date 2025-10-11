@@ -2,13 +2,18 @@
     import { onMount } from "svelte";
 
     let activeTab = "curl";
+    let useSSH = false;
     let copyButton = null;
     let copyButtonText = "📋 复制";
     let originalCopyButtonText = "📋 复制";
 
     const commands = {
         curl: "curl -fsSL https://dotfiles.keveon.io/install.sh | bash",
+        curl_ssh:
+            "curl -fsSL https://dotfiles.keveon.io/install.sh | bash -s -- --ssh",
         wget: "wget -qO- https://dotfiles.keveon.io/install.sh | bash",
+        wget_ssh:
+            "wget -qO- https://dotfiles.keveon.io/install.sh | bash -s -- --ssh",
     };
 
     // 切换标签页
@@ -16,10 +21,19 @@
         activeTab = tabName;
     }
 
+    // 获取当前命令
+    function getCurrentCommand() {
+        if (useSSH) {
+            return commands[`${activeTab}_ssh`];
+        }
+        return commands[activeTab];
+    }
+
     // 复制命令
     async function copyCommand() {
         try {
-            await navigator.clipboard.writeText(commands[activeTab]);
+            const currentCommand = getCurrentCommand();
+            await navigator.clipboard.writeText(currentCommand);
 
             // 更新按钮文本和样式
             originalCopyButtonText = copyButtonText;
@@ -118,45 +132,46 @@
                 </div>
             </div>
 
+            <!-- SSH 选项 -->
+            <div class="mb-6">
+                <label class="flex items-center cursor-pointer group">
+                    <input
+                        type="checkbox"
+                        bind:checked={useSSH}
+                        class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer accent-primary-600"
+                    />
+                    <span
+                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                    >
+                        🔐 使用 SSH 协议（需要配置 SSH 密钥）
+                    </span>
+                </label>
+                {#if useSSH}
+                    <p
+                        class="mt-2 text-xs text-gray-600 dark:text-gray-400 ml-7"
+                    >
+                        🔑 需要提前配置 SSH 密钥并添加到 GitHub 账户
+                    </p>
+                {/if}
+            </div>
+
             <!-- 命令显示区域 -->
             <div class="command-container">
-                <!-- Curl 命令 -->
-                {#if activeTab === "curl"}
-                    <div class="command-content">
-                        <div
-                            class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg font-mono text-sm text-left break-all flex items-center justify-between"
+                <div class="command-content">
+                    <div
+                        class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg font-mono text-sm text-left break-all flex items-center justify-between"
+                    >
+                        <span class="flex-1">{getCurrentCommand()}</span>
+                        <button
+                            bind:this={copyButton}
+                            data-command="install"
+                            class="text-sm bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded-md transition-colors ml-4 flex-shrink-0"
+                            on:click={copyCommand}
                         >
-                            <span class="flex-1">{commands.curl}</span>
-                            <button
-                                bind:this={copyButton}
-                                data-command="install"
-                                class="text-sm bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded-md transition-colors ml-4 flex-shrink-0"
-                                on:click={copyCommand}
-                            >
-                                {copyButtonText}
-                            </button>
-                        </div>
+                            {copyButtonText}
+                        </button>
                     </div>
-                {/if}
-
-                <!-- Wget 命令 -->
-                {#if activeTab === "wget"}
-                    <div class="command-content">
-                        <div
-                            class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg font-mono text-sm text-left break-all flex items-center justify-between"
-                        >
-                            <span class="flex-1">{commands.wget}</span>
-                            <button
-                                bind:this={copyButton}
-                                data-command="install"
-                                class="text-sm bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded-md transition-colors ml-4 flex-shrink-0"
-                                on:click={copyCommand}
-                            >
-                                {copyButtonText}
-                            </button>
-                        </div>
-                    </div>
-                {/if}
+                </div>
             </div>
         </div>
     </div>

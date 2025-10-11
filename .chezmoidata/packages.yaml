@@ -1,0 +1,35 @@
+packages:
+  darwin:
+    taps:
+      # - "hashicorp/tap"
+
+    brews:
+      # - "bat"
+      # - "ripgrep"
+      - "coreutils"
+      # - "erdtree"
+      # - "eza"
+      # - "fd"
+      # - "gh"
+      - "gnupg"
+      # - "httpie"
+      # - "jq"
+      - "neovim"
+      # - "pwgen"
+      # - "starship"
+      - "tmux"
+      # - "tree-sitter-cli"
+      # - "unzip"
+      # - "watch"
+      # - "wget"
+      # - "yq"
+      # - "zoxide"
+      # - "hashicorp/tap/vault"
+
+    casks:
+      # - "font-maple-mono-nf-cn"
+      # - "iterm2"
+      # - "keka"
+      # - "one-switch"
+      # - "raycast"
+      # - "zed"

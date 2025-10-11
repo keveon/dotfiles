@@ -5,8 +5,6 @@ chezmoi = "latest"
 usage = "latest"
 
 {{- if eq .chezmoi.os "darwin" }}
-# node = "lts"
-# pnpm = "latest"
 {{- end }}
 
 {{- if eq .chezmoi.os "linux" }}
