@@ -3,48 +3,10 @@
 # ~/.zprofile
 ###############################################################################
 
-# 计算长主机名（优先 FQDN，退回短名）
-long_host="$(hostname -f 2>/dev/null || hostname)"
-
-# tmux：SSH 交互登录 + 不在 tmux 时自动进入
-# 可覆盖：
-#   export TMUX_CC=1/0/auto         # 强制启用/禁用/自动侦测 -CC（默认 auto）
-#   export TMUX_SESSION=<session>   # 自定义会话名，默认 "<long_host>-<user>"
+# tmux：仅 iTerm2 SSH 会话自动进入 -CC 模式
 if command -v tmux >/dev/null 2>&1; then
-  if [[ -n "$SSH_TTY" && -z "$TMUX" && -t 1 ]]; then
-    session="${TMUX_SESSION:-${long_host}-$USER}"
-
-    # iTerm2 远程会透传 LC_TERMINAL=iTerm2
-    use_cc=0
-    case "${TMUX_CC:-auto}" in
-      1|true|on|yes) use_cc=1 ;;
-      0|false|off|no) use_cc=0 ;;
-      auto) [[ "${LC_TERMINAL:-}" == "iTerm2" ]] && use_cc=1 ;;
-    esac
-
-    if [[ $use_cc -eq 1 ]]; then
-      tmux -u -CC new-session -A -s "$session"
-    else
-      tmux new-session -A -s "$session"
-    fi
+  if [[ -n "$SSH_TTY" && -z "$TMUX" && -t 1 && "${LC_TERMINAL:-}" == "iTerm2" ]]; then
+    tmux -u -CC new-session -A -s main
     exit
   fi
-fi
-
-# ---- pretty uptime (GNU/BSD 兼容) ----
-_pretty_uptime() {
-  if uptime -p >/dev/null 2>&1; then
-    uptime -p
-  else
-    # BSD/macOS：抽取 "up xxx" 部分，失败就退回原始 uptime
-    local s
-    s="$(uptime 2>/dev/null)" || return 0
-    echo "$s" | sed -E 's/.* up (.*), [0-9]+ user(s)?,.*/up \1/' 2>/dev/null || echo "$s"
-  fi
-}
-
-# ---- 欢迎信息：只在 SSH 登录时显示（本地新会话不显示）----
-if [[ -n "$SSH_TTY" ]]; then
-  long_host="$(hostname -f 2>/dev/null || hostname)"
-  printf 'Welcome %s@%s — %s\n' "$USER" "$long_host" "$(_pretty_uptime)"
 fi

@@ -1,16 +1,15 @@
-{{ $username := "" }}
-{{ $email := "" }}
-{{ if stdinIsATTY }}
-{{   $username = promptStringOnce . "github.username" "请输入 GitHub 用户名:" }}
-{{   $email = promptStringOnce . "github.email" "请输入邮箱地址: " }}
-{{ end }}
+{{- $username := "" -}}
+{{- $email := "" -}}
+{{- if stdinIsATTY -}}
+{{-   $username = promptStringOnce . "github.username" "请输入 GitHub 用户名:" -}}
+{{-   $email = promptStringOnce . "github.email" "请输入邮箱地址: " -}}
+{{- end -}}
 
 {{- $osid := .chezmoi.os -}}
 {{- if hasKey .chezmoi.osRelease "id" -}}
 {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
 {{- end -}}
 
-# 数据部分
 [data]
     osid = {{ $osid | quote }}
 

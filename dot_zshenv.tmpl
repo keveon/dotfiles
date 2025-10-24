@@ -8,7 +8,13 @@ export LANG=zh_CN.UTF-8
 export LC_ALL=zh_CN.UTF-8
 
 # -- 统一的 PATH 追加函数 --
-path_prepend() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH";; esac }
+path_prepend() {
+  [[ -d "$1" ]] || return
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) export PATH="$1:$PATH";;
+  esac
+}
 
 # -- Brew shellenv 自动探测（Apple Silicon / Intel Mac / Linuxbrew）--
 __brew_shellenv() {
@@ -41,10 +47,11 @@ __brew_shellenv() {
 __brew_shellenv
 unset -f __brew_shellenv
 
-# -- 追加常用路径到 PATH --
-for d in "${KREW_ROOT:-$HOME/.krew}/bin" "$HOME/.local/bin" "$HOME/bin"; do
-  [[ -d "$d" ]] && path_prepend "$d"
-done
+# -- 追加常用路径到 PATH（按优先级从低到高）--
+path_prepend "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
+path_prepend "${KREW_ROOT:-$HOME/.krew}/bin"
+path_prepend "$HOME/bin"
+path_prepend "$HOME/.local/bin"
 
 if command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"

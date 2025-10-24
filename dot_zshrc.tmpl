@@ -125,15 +125,17 @@ unset key
 # neovim 替代 vi、vim
 # ------------------------------
 
-alias vi="nvim"
-alias vim="nvim"
+if command -v nvim >/dev/null 2>&1; then
+  alias vi="nvim"
+  alias vim="nvim"
+fi
 
 # ------------------------------
 # 彩色 diff
 # ------------------------------
 
-if diff --color=auto /dev/null /dev/null >/dev/null 2>&1; then
-  alias diff='diff --color=auto'
-elif command -v colordiff >/dev/null 2>&1; then
+if command -v colordiff >/dev/null 2>&1; then
   alias diff='colordiff'
+elif diff --color=auto /dev/null /dev/null >/dev/null 2>&1; then
+  alias diff='diff --color=auto'
 fi
