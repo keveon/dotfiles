@@ -6,7 +6,7 @@
 # tmux：仅 iTerm2 SSH 会话自动进入 -CC 模式
 if command -v tmux >/dev/null 2>&1; then
   if [[ -n "$SSH_TTY" && -z "$TMUX" && -t 1 && "${LC_TERMINAL:-}" == "iTerm2" ]]; then
-    tmux -u -CC new-session -A -s main
+    tmux -u -CC new-session -A -D -s main
     exit
   fi
 fi
