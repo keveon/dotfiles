@@ -139,7 +139,7 @@ install_system_dependencies() {
         linux)
             log_info "通过 apt-get 安装依赖包..."
             sudo apt-get update -y
-            sudo apt-get install -y gpg zsh curl git
+            sudo apt-get install -y gpg zsh curl git tmux
             ;;
     esac
 
@@ -169,9 +169,26 @@ install_mise() {
 }
 
 install_chezmoi() {
-    if command_exists chezmoi; then
+    local force_reinstall="${1:-false}"
+
+    if command_exists chezmoi && [[ "$force_reinstall" != "true" ]]; then
         log_success "Chezmoi 已安装: $(chezmoi --version)"
         return 0
+    fi
+
+    # 如果是强制重装，先卸载现有的 chezmoi
+    if [[ "$force_reinstall" == "true" ]] && command_exists chezmoi; then
+        log_info "检测到 --force 参数，正在卸载现有的 Chezmoi..."
+
+        # 通过 Mise 卸载
+        if command_exists mise; then
+            mise uninstall chezmoi 2>/dev/null || true
+        fi
+
+        # 清理可能的二进制文件
+        rm -f "$HOME/.local/bin/chezmoi" 2>/dev/null || true
+
+        log_success "Chezmoi 已卸载"
     fi
 
     log_info "安装 Chezmoi..."
@@ -303,22 +320,7 @@ configure_linux() {
 # ============================================================================
 
 setup_dotfiles() {
-
-    # 检查是否已安装
-    if [[ -d "$CHEZMOI_SOURCE_DIR" ]]; then
-        log_info "Dotfiles 已安装，跳过安装步骤"
-        echo ""
-        echo "💡 如需更新配置，请运行："
-        echo "   chezmoi update"
-        echo "   chezmoi apply"
-        echo ""
-        echo "💡 如需重新安装，请删除现有配置："
-        echo "   rm -rf ~/.local/share/chezmoi"
-        echo "   然后重新运行此脚本"
-        echo ""
-        return 0
-    fi
-
+    local force_reinstall=false
     local repo_slug="$REPO_SLUG_DEFAULT"
     local ssh_option=""
 
@@ -345,6 +347,10 @@ setup_dotfiles() {
                 ssh_option="--ssh"
                 shift 1
                 ;;
+            --force|--reinstall)
+                force_reinstall=true
+                shift 1
+                ;;
             --help|-h)
                 show_usage
                 exit 0
@@ -363,7 +369,31 @@ setup_dotfiles() {
         esac
     done
 
-    # 首次安装
+    # 检查是否已安装
+    if [[ -d "$CHEZMOI_SOURCE_DIR" ]] && [[ "$force_reinstall" != "true" ]]; then
+        log_info "Dotfiles 已安装，跳过安装步骤"
+        echo ""
+        echo "💡 如需更新配置，请运行："
+        echo "   chezmoi update"
+        echo "   chezmoi apply"
+        echo ""
+        echo "💡 如需强制重新安装，请运行："
+        echo "   $0 --force"
+        echo ""
+        return 0
+    fi
+
+    # 如果是强制重装，清理现有配置
+    if [[ "$force_reinstall" == "true" ]] && [[ -d "$CHEZMOI_SOURCE_DIR" ]]; then
+        log_info "检测到强制重装参数，正在清理现有配置..."
+        rm -rf "$CHEZMOI_SOURCE_DIR"
+        log_success "现有配置已清理"
+    fi
+
+    # 安装或重装 chezmoi
+    install_chezmoi "$force_reinstall"
+
+    # 克隆并应用 Dotfiles
     log_info "克隆并应用 Dotfiles..."
     mise exec chezmoi -- chezmoi init $ssh_option --apply "$repo_slug"
 
@@ -379,20 +409,30 @@ show_usage() {
 用法: $0 [选项]
 
 选项:
-    --repo <REPO>   指定仓库标识符 (默认: $REPO_SLUG_DEFAULT)
-                    示例: keveon, keveon/dotfiles, github.com/keveon/dotfiles
-    --ssh           使用 SSH 协议（需要配置 SSH 密钥）
-    --help, -h      显示帮助信息
+    --repo <REPO>       指定仓库标识符 (默认: $REPO_SLUG_DEFAULT)
+                        示例: keveon, keveon/dotfiles, github.com/keveon/dotfiles
+    --ssh               使用 SSH 协议（需要配置 SSH 密钥）
+    --force, --reinstall 强制重新安装 chezmoi 和 dotfiles
+                        会先卸载现有版本，然后重新安装最新版本
+    --help, -h          显示帮助信息
 
 示例:
-    $0                         # 使用默认仓库 (HTTPS)
-    $0 --repo <repo>           # 使用指定用户的仓库 (HTTPS)
-    $0 --ssh                   # 使用 SSH 协议克隆默认仓库
+    $0                              # 使用默认仓库 (HTTPS)
+    $0 --repo <repo>                # 使用指定用户的仓库 (HTTPS)
+    $0 --ssh                        # 使用 SSH 协议克隆默认仓库
+    $0 --force                      # 强制重新安装默认仓库
+    $0 --repo <repo> --ssh --force  # 组合使用多个选项
+
+重装场景:
+    - 当 chezmoi 版本过旧时
+    - 当配置文件损坏需要重置时
+    - 当切换到不同的 dotfiles 仓库时
+    - 当遇到配置冲突需要清理时
 
 注意:
     - 如果 dotfiles 已安装，脚本会跳过安装步骤
-    - 如需更新配置，请运行: chezmoi update
-    - 如需重新安装，请删除: rm -rf ~/.local/share/chezmoi
+    - 使用 --force 会完全重新安装，包括清理现有配置
+    - 如需更新配置而不重装，请运行: chezmoi update
     - 使用 --ssh 选项前需要先配置 SSH 密钥
     - 需要添加 SSH 密钥到 GitHub 账户才能正常使用 --ssh
 
@@ -421,10 +461,7 @@ main() {
     # 安装系统依赖
     install_system_dependencies "$os"
 
-    # 安装 Chezmoi
-    install_chezmoi
-
-    # 配置 Dotfiles（包含参数解析）
+    # 配置 Dotfiles（包含参数解析和 chezmoi 安装）
     setup_dotfiles "$@"
 
     # 配置 Shell

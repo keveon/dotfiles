@@ -16,7 +16,7 @@ path_prepend() {
   esac
 }
 
-# -- Brew shellenv 自动探测（Apple Silicon / Intel Mac / Linuxbrew）--
+# -- Brew shellenv 自动探测 (Apple Silicon / Intel Mac / Linuxbrew) --
 __brew_shellenv() {
   # 1) 常见安装前缀优先
   local candidates=(
@@ -34,7 +34,7 @@ __brew_shellenv() {
     fi
   done
 
-  # 2) 兜底：PATH 里能找到 brew 的情况
+  # 2) 兜底: PATH 里能找到 brew 的情况
   if command -v brew >/dev/null 2>&1; then
     eval "$(brew shellenv)"
     return
@@ -47,11 +47,57 @@ __brew_shellenv() {
 __brew_shellenv
 unset -f __brew_shellenv
 
-# -- 追加常用路径到 PATH（按优先级从低到高）--
+# -- 追加常用路径到 PATH (按优先级从低到高) --
 path_prepend "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
-path_prepend "${KREW_ROOT:-$HOME/.krew}/bin"
+
+# PostgreSQL libpq (可选依赖)
+# 只有在 libpq 通过 Homebrew 安装时才添加其 bin 目录到 PATH
+if command -v brew >/dev/null 2>&1; then
+	libpq_prefix=$(brew --prefix libpq 2>/dev/null)
+	if [[ -n "$libpq_prefix" && -d "$libpq_prefix/bin" ]]; then
+		path_prepend "$libpq_prefix/bin"
+	fi
+fi
+
+if command -v pnpm >/dev/null 2>&1; then
+	{{ if eq .chezmoi.os "darwin" }}
+	export PNPM_HOME="${HOME}/Library/pnpm"
+	{{ else if eq .chezmoi.os "linux" }}
+	export PNPM_HOME="${HOME}/.local/share/pnpm"
+	{{ end }}
+	path_prepend "$PNPM_HOME"
+fi
+
+if command -v krew >/dev/null 2>&1; then
+	path_prepend "${KREW_ROOT:-$HOME/.krew}/bin"
+fi
+
 path_prepend "$HOME/bin"
 path_prepend "$HOME/.local/bin"
+
+# -- 统一的 fpath 追加函数 --
+fpath_prepend() {
+	[[ -d "$1" ]] || return
+	case ":${fpath}:" in
+	*":$1:"*) ;;
+	*) fpath=("$1" "${fpath[@]}") ;;
+	esac
+}
+
+# -- 追加常用的 fpath (避免与 zim 重复) --
+fpath_prepend "${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
+fpath_prepend "$HOME/.zsh/completions"
+
+# Go completions (如果安装了 go)
+if command -v go >/dev/null 2>&1; then
+	fpath_prepend "$(go env GOPATH 2>/dev/null || echo "$HOME/go")/share/zsh/site-functions"
+fi
+
+# Python completions (如果安装了 python)
+if command -v python3 >/dev/null 2>&1; then
+	python3 -c "import argcomplete" 2>/dev/null && \
+		eval "$(register-python-argcomplete3)"
+fi
 
 if command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"

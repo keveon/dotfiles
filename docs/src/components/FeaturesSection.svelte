@@ -14,7 +14,7 @@
                 <div class="text-5xl mb-4 animate-bounce">🍎🐧</div>
                 <h3 class="text-xl font-bold mb-3 text-white">多平台支持</h3>
                 <p class="text-white/90">
-                    完美支持 macOS 和 Linux，自动检测平台并适配不同的包管理器
+                    完美支持 macOS 和 Linux，自动检测平台并适配不同的包管理器。新增对 Linux 的完整支持，包括 30+ 实用工具
                 </p>
             </div>
             <div
@@ -23,7 +23,7 @@
                 <div class="text-5xl mb-4 animate-pulse">⚡</div>
                 <h3 class="text-xl font-bold mb-3 text-white">自动化配置</h3>
                 <p class="text-white/90">
-                    一键安装开发环境，包括系统依赖、Shell 配置、开发工具等
+                    一键安装开发环境，包括系统依赖、Shell 配置、开发工具等。支持强制重装，自动配置 Zsh 补全
                 </p>
             </div>
             <div
@@ -32,8 +32,7 @@
                 <div class="text-5xl mb-4 animate-pulse">🛠️</div>
                 <h3 class="text-xl font-bold mb-3 text-white">工具集成</h3>
                 <p class="text-white/90">
-                    集成 Chezmoi、Mise、Zim 框架，支持 Go、Rust、Node.js
-                    等开发环境
+                    集成 Chezmoi、Mise 任务管理系统，支持 Go、Rust、Node.js 等开发环境。提供完整的现代化 CLI 工具集
                 </p>
             </div>
         </div>

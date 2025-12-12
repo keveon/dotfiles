@@ -5,15 +5,16 @@
 {{- end }}
 
 {{- if eq .chezmoi.os "linux" }}
-bat = { version = "latest", postinstall = "mise exec bat -- bat --completion zsh | tee /usr/local/share/zsh/site-functions/_bat" }
-eza = "latest"
-fd = "latest"
+bat = { version = "latest", postinstall = "mise run bat:setup" }
+eza = { version = "latest", postinstall = "mise run eza:setup" }
+fd = { version = "latest", postinstall = "mise run fd:setup" }
 fzf = "latest"
 jq = "latest"
 neovim = "latest"
-rg = "latest"
+rg = { version = "latest", postinstall = "mise run rg:setup" }
 starship = "latest"
-yq = "latest"
+tmux = "latest"
+yq = { version = "latest", postinstall = "mise run yq:setup" }
 zoxide = "latest"
 {{- end }}
 

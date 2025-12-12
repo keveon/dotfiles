@@ -3,6 +3,7 @@
 
     let activeTab = "curl";
     let useSSH = false;
+    let forceReinstall = false;
     let copyButton = null;
     let copyButtonText = "📋 复制";
     let originalCopyButtonText = "📋 复制";
@@ -11,9 +12,17 @@
         curl: "curl -fsSL https://dotfiles.keveon.io/install.sh | bash",
         curl_ssh:
             "curl -fsSL https://dotfiles.keveon.io/install.sh | bash -s -- --ssh",
+        curl_force:
+            "curl -fsSL https://dotfiles.keveon.io/install.sh | bash -s -- --force",
+        curl_ssh_force:
+            "curl -fsSL https://dotfiles.keveon.io/install.sh | bash -s -- --ssh --force",
         wget: "wget -qO- https://dotfiles.keveon.io/install.sh | bash",
         wget_ssh:
             "wget -qO- https://dotfiles.keveon.io/install.sh | bash -s -- --ssh",
+        wget_force:
+            "wget -qO- https://dotfiles.keveon.io/install.sh | bash -s -- --force",
+        wget_ssh_force:
+            "wget -qO- https://dotfiles.keveon.io/install.sh | bash -s -- --ssh --force",
     };
 
     // 切换标签页
@@ -23,10 +32,17 @@
 
     // 获取当前命令
     function getCurrentCommand() {
-        if (useSSH) {
-            return commands[`${activeTab}_ssh`];
+        let commandKey = activeTab;
+
+        if (useSSH && forceReinstall) {
+            commandKey = `${activeTab}_ssh_force`;
+        } else if (useSSH) {
+            commandKey = `${activeTab}_ssh`;
+        } else if (forceReinstall) {
+            commandKey = `${activeTab}_force`;
         }
-        return commands[activeTab];
+
+        return commands[commandKey];
     }
 
     // 复制命令
@@ -89,7 +105,7 @@
         <p
             class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto drop-shadow-lg"
         >
-            基于 Chezmoi + Mise + Zim 的多平台配置管理方案，支持 macOS 和 Linux
+            基于 Chezmoi + Mise 的多平台配置管理方案，一键安装 30+ 精选开发工具，支持 macOS 和 Linux
         </p>
 
         <!-- 一键安装区域 -->
@@ -133,7 +149,7 @@
             </div>
 
             <!-- SSH 选项 -->
-            <div class="mb-6">
+            <div class="mb-4">
                 <label class="flex items-center cursor-pointer group">
                     <input
                         type="checkbox"
@@ -151,6 +167,29 @@
                         class="mt-2 text-xs text-gray-600 dark:text-gray-400 ml-7"
                     >
                         🔑 需要提前配置 SSH 密钥并添加到 GitHub 账户
+                    </p>
+                {/if}
+            </div>
+
+            <!-- 强制重装选项 -->
+            <div class="mb-6">
+                <label class="flex items-center cursor-pointer group">
+                    <input
+                        type="checkbox"
+                        bind:checked={forceReinstall}
+                        class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer accent-primary-600"
+                    />
+                    <span
+                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
+                    >
+                        ⚡ 强制重新安装（清理现有配置）
+                    </span>
+                </label>
+                {#if forceReinstall}
+                    <p
+                        class="mt-2 text-xs text-gray-600 dark:text-gray-400 ml-7"
+                    >
+                        ⚠️ 将删除现有的 chezmoi 配置并重新安装
                     </p>
                 {/if}
             </div>

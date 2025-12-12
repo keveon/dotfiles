@@ -1,0 +1,61 @@
+#!/usr/bin/env zsh
+
+#MISE description="安装 Headscale"
+
+# 使用 chezmoi 模板确定系统类型和架构
+OS_TYPE="{{ .chezmoi.os | lower }}"
+ARCH="{{ .chezmoi.arch }}"
+
+# 获取最新版本号
+if command -v curl >/dev/null 2>&1; then
+  API_VERSION=$(curl -s "https://api.github.com/repos/juanfont/headscale/releases/latest" | grep '"tag_name":' | sed -E 's/.*"tag_name": ?"v?([^"]+).*/\1/')
+elif command -v wget >/dev/null 2>&1; then
+  API_VERSION=$(wget -qO- "https://api.github.com/repos/juanfont/headscale/releases/latest" | grep '"tag_name":' | sed -E 's/.*"tag_name": ?"v?([^"]+).*/\1/')
+else
+  echo "错误: 需要安装 curl 或 wget 来获取版本信息"
+  exit 1
+fi
+
+if [ -z "$API_VERSION" ]; then
+  echo "错误: 无法获取最新版本信息"
+  exit 1
+fi
+
+echo "找到最新版本: ${API_VERSION}"
+
+DOWNLOAD_URL="https://github.com/juanfont/headscale/releases/download/v${API_VERSION}/headscale_${API_VERSION}_${OS_TYPE}_${ARCH}"
+
+# 创建安装目录
+mkdir -vp ~/.local/bin/
+
+# 下载并安装
+echo "下载 Headscale..."
+if command -v wget >/dev/null 2>&1; then
+  wget -O ~/.local/bin/headscale "${DOWNLOAD_URL}"
+elif command -v curl >/dev/null 2>&1; then
+  curl -L -o ~/.local/bin/headscale "${DOWNLOAD_URL}"
+else
+  echo "错误: 需要安装 wget 或 curl"
+  exit 1
+fi
+
+# 设置执行权限
+chmod +x ~/.local/bin/headscale
+
+# 验证安装
+if ~/.local/bin/headscale version 2>/dev/null; then
+  echo "Headscale ${API_VERSION} 安装成功!"
+else
+  echo "错误: 安装失败"
+  exit 1
+fi
+
+# 安装 zsh 自动补全
+COMPLETION_DIR="{{ .chezmoi.homeDir }}/.local/share/zsh/site-functions"
+mkdir -p "$COMPLETION_DIR"
+if ~/.local/bin/headscale completion zsh > "${COMPLETION_DIR}/_headscale" 2>/dev/null; then
+  echo "Zsh 自动补全已安装到: ${COMPLETION_DIR}/_headscale"
+fi
+
+# 清理变量
+unset OS_TYPE ARCH API_VERSION DOWNLOAD_URL
