@@ -151,25 +151,35 @@ install_system_dependencies() {
 # ============================================================================
 
 install_mise() {
+    local os="$1"
+
     if command_exists mise; then
         log_success "Mise 已安装"
         return 0
     fi
 
     log_info "安装 Mise..."
-    curl https://mise.run | sh
 
-    # 重新加载环境
-    export PATH="$MISE_INSTALL_DIR:$PATH"
-    if [[ -f "$MISE_INSTALL_DIR/mise" ]]; then
-        eval "$("$MISE_INSTALL_DIR/mise" activate bash)"
-    fi
+    case "$os" in
+        macos)
+            brew install --quiet mise
+            ;;
+        linux)
+            curl https://mise.run | sh
+            # 重新加载环境
+            export PATH="$MISE_INSTALL_DIR:$PATH"
+            if [[ -f "$MISE_INSTALL_DIR/mise" ]]; then
+                eval "$("$MISE_INSTALL_DIR/mise" activate bash)"
+            fi
+            ;;
+    esac
 
     log_success "Mise 安装完成"
 }
 
 install_chezmoi() {
-    local force_reinstall="${1:-false}"
+    local os="$1"
+    local force_reinstall="${2:-false}"
 
     if command_exists chezmoi && [[ "$force_reinstall" != "true" ]]; then
         log_success "Chezmoi 已安装: $(chezmoi --version)"
@@ -180,27 +190,34 @@ install_chezmoi() {
     if [[ "$force_reinstall" == "true" ]] && command_exists chezmoi; then
         log_info "检测到 --force 参数，正在卸载现有的 Chezmoi..."
 
-        # 通过 Mise 卸载
-        if command_exists mise; then
-            mise uninstall chezmoi 2>/dev/null || true
-        fi
-
-        # 清理可能的二进制文件
-        rm -f "$HOME/.local/bin/chezmoi" 2>/dev/null || true
+        case "$os" in
+            macos)
+                brew uninstall chezmoi 2>/dev/null || true
+                ;;
+            linux)
+                # 通过 Mise 卸载
+                if command_exists mise; then
+                    mise uninstall chezmoi 2>/dev/null || true
+                fi
+                # 清理可能的二进制文件
+                rm -f "$HOME/.local/bin/chezmoi" 2>/dev/null || true
+                ;;
+        esac
 
         log_success "Chezmoi 已卸载"
     fi
 
     log_info "安装 Chezmoi..."
 
-    if command_exists mise; then
-        log_info "通过 Mise 安装 Chezmoi..."
-        mise use -g chezmoi@latest
-    else
-        install_mise
-        log_info "通过 Mise 安装 Chezmoi..."
-        mise use -g chezmoi@latest
-    fi
+    case "$os" in
+        macos)
+            brew install --quiet chezmoi
+            ;;
+        linux)
+            log_info "通过 Mise 安装 Chezmoi..."
+            mise use -g chezmoi@latest
+            ;;
+    esac
 
     log_success "Chezmoi 安装完成"
 }
@@ -323,6 +340,8 @@ setup_dotfiles() {
     local force_reinstall=false
     local repo_slug="$REPO_SLUG_DEFAULT"
     local ssh_option=""
+    local os
+    os=$(detect_os)
 
     # 解析命令行参数
     while [[ $# -gt 0 ]]; do
@@ -390,12 +409,22 @@ setup_dotfiles() {
         log_success "现有配置已清理"
     fi
 
+    # 安装 mise
+    install_mise "$os"
+
     # 安装或重装 chezmoi
-    install_chezmoi "$force_reinstall"
+    install_chezmoi "$os" "$force_reinstall"
 
     # 克隆并应用 Dotfiles
     log_info "克隆并应用 Dotfiles..."
-    mise exec chezmoi -- chezmoi init $ssh_option --apply "$repo_slug"
+    case "$os" in
+        macos)
+            chezmoi init $ssh_option --apply "$repo_slug"
+            ;;
+        linux)
+            mise exec chezmoi -- chezmoi init $ssh_option --apply "$repo_slug"
+            ;;
+    esac
 
     log_success "Dotfiles 配置完成"
 }

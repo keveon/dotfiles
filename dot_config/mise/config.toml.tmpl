@@ -1,13 +1,13 @@
 # vim: set filetype=toml:
 
 [tools]
-chezmoi = "latest"
-usage = "latest"
 
 {{- if eq .chezmoi.os "darwin" }}
 {{- end }}
 
 {{- if eq .chezmoi.os "linux" }}
+chezmoi = "latest"
+usage = "latest"
 {{- end }}
 
 [env]
