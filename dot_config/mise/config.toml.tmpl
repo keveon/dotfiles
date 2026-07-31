@@ -1,13 +1,22 @@
 # vim: set filetype=toml:
 
 [tools]
-
 {{- if eq .chezmoi.os "darwin" }}
 {{- end }}
 
 {{- if eq .chezmoi.os "linux" }}
 chezmoi = "latest"
 usage = "latest"
+bat = { version = "latest", postinstall = "mise run bat:setup" }
+eza = "latest"
+fd = { version = "latest", postinstall = "mise run fd:setup" }
+fzf = "latest"
+jq = "latest"
+neovim = "latest"
+rg = { version = "latest", postinstall = "mise run rg:setup" }
+starship = "latest"
+yq = { version = "latest", postinstall = "mise run yq:setup" }
+zoxide = "latest"
 {{- end }}
 
 [env]

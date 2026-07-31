@@ -13,26 +13,25 @@ zmodule joke/zim-mise
 zmodule termtitle
 zmodule utility
 
-zmodule exa
-zmodule direnv
-zmodule joke/zim-chezmoi
-zmodule kiesman99/zim-zoxide
+zmodule z-shell/zsh-eza --if-command eza
+zmodule joke/zim-chezmoi --if-command chezmoi
+zmodule kiesman99/zim-zoxide --if-command zoxide
 zmodule shanwker1223/zim-alias-finder
 
-zmodule fzf
+zmodule fzf --if-command fzf
 
 # ------------------------------
 # Prompt
 # ------------------------------
 
-zmodule joke/zim-starship
+zmodule joke/zim-starship --if-command starship
 
 # ------------------------------
 # Completion
 # ------------------------------
 
 zmodule zsh-users/zsh-completions --fpath src
-zmodule gradle/gradle-completion --fpath .
+zmodule gradle/gradle-completion --fpath . --if-command gradle
 
 zmodule completion
 
